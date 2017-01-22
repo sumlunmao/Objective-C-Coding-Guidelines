@@ -1,10 +1,12 @@
 
-# 搜狐视频 移动团队 Objective-C 规范指南
+# 搜狐视频iOS团队 Objective-C 编码规范
+![](https://img.shields.io/badge/coverage-70%25-yellow.svg)
+
 这份规范指南概括了搜狐视频 iOS 团队的代码约定。
 
+长期以来不同的编码习惯让每个人不习惯，因此编写这份规范。
 
-代码风格的重要性对于一个团队和项目来说不言而喻。
-网上有许多 Objective-C 的代码风格，但这份简洁而又最符合苹果的规范，同时有助于养成良好的代码习惯，也请严格遵循代码风格。
+有助于养成良好的代码习惯，也请严格遵循代码风格。
 
 ## 介绍
 
@@ -781,15 +783,3 @@ __weak __typeof(self)weakSelf = self;
 [Xcode-project_1]:http://boredzo.org/blog/archives/2009-11-07/warnings
 
 [Xcode-project_2]:http://clang.llvm.org/docs/UsersManual.html#controlling-diagnostics-via-pragmas
-
-
-# 其他 Objective-C 风格指南
-
-* [Google](http://google-styleguide.googlecode.com/svn/trunk/objcguide.xml)
-* [GitHub](https://github.com/github/objective-c-conventions)
-* [Adium](https://trac.adium.im/wiki/CodingStyle)
-* [Sam Soffes](https://gist.github.com/soffes/812796)
-* [CocoaDevCentral](http://cocoadevcentral.com/articles/000082.php)
-* [Luke Redpath](http://lukeredpath.co.uk/blog/my-objective-c-style-guide.html)
-* [Marcus Zarra](http://www.cimgf.com/zds-code-style-guide/)
-* [Wikimedia](https://www.mediawiki.org/wiki/Wikimedia_Apps/Team/iOS/ObjectiveCStyleGuide)
