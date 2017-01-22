@@ -291,17 +291,25 @@ if (error) {
 例如：
 
 NSString *title：表示这个“title”是一个字符串。
+
 NSString *titleHTML：这表示可能包含需要解析显示的HTML的标题。程序员需要“HTML”才能有效地使用这个变量。
+
 NSAttributedString *titleAttributedString：已格式化为显示的标题。AttributedString提示这个值不只是一个普通标题，根据上下文，做出合理的选择。
+
 NSDate *now：无需进一步澄清。
+
 NSDate *lastModifiedDate：简单地lastModified可能是不明确; 根据上下文，可以合理地假设它是几种不同类型之一。
+
 NSURL *URL对比NSString *URLString：在情况下，当一个值可以合理由不同的类来表示，它通常是非常有用的变量名称来消除歧义。
+
 NSString *releaseDateString：另一个例子，其中值可以由另一个类表示，并且该名称可以帮助消除歧义。
+
 不推荐使用单字母变量名，除非在循环中作为简单的计数器变量。
 
 指示类型的星号是必须“附加到”变量名的指针。例如， NSString *text 不 NSString* text或NSString * text除了在常量的情况下（NSString * const NYTConstantString）。
 
 星号表示指针属于变量，例如：`NSString *text` 不要写成 `NSString* text` 或者 `NSString * text` ，常量除外。
+
 尽量定义属性来代替直接使用实例变量。除了初始化方法（`init`， `initWithCoder:`，等）， `dealloc` 方法和自定义的 setters 和 getters 内部，应避免直接访问实例变量。更多有关在初始化方法和 dealloc 方法中使用访问器方法的信息，参见[这里][Variables_1]。
 
 
@@ -334,9 +342,9 @@ NSString *releaseDateString：另一个例子，其中值可以由另一个类�
 
 ## 命名
 
-尽可能遵守苹果的命名约定，尤其那些涉及到[内存管理规则][Naming_1]，（[NARC][Naming_2]）的。
+应使用驼峰命名法命名
 
-长的和描述性的方法名和变量名都不错。
+尽可能遵守苹果的命名约定，尤其那些涉及到[内存管理规则][Naming_1]，（[NARC][Naming_2]）的。
 
 **推荐：**
 
@@ -584,14 +592,21 @@ NYTAdCategoryTechnology = 1 << 3
 
 ## 图片命名
 
-图片名称应该被统一命名以保持组织的完整。它们应该被命名为一个说明它们用途的驼峰式字符串，其次是自定义类或属性的无前缀名字（如果有的话），然后进一步说明颜色 和/或 展示位置，最后是它们的状态。
+1.用英文命名，不用拼音
+
+2.每一部分用'-'分隔。分割的第一个首字母大写。
+
+3.尽量表现内容+使用类型
+
+4.尽量同一页面放置在同一个文件夹下
 
 **推荐：**
 
-* `RefreshBarButtonItem` / `RefreshBarButtonItem@2x` 和 `RefreshBarButtonItemSelected` / `RefreshBarButtonItemSelected@2x`
-* `ArticleNavigationBarWhite` / `ArticleNavigationBarWhite@2x` 和 `ArticleNavigationBarBlackSelected` / `ArticleNavigationBarBlackSelected@2x`.
+```objc
+Download-Progressbar-Highlighted@2x.png
+Download-Progressbar-Normal@2x.png
+```
 
-图片目录中被用于类似目的的图片应归入各自的组中。
 
 
 ## 布尔
