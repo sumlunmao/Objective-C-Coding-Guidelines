@@ -27,6 +27,9 @@
 ## 目录
 
 * [点语法](#点语法)
+* [函数的书写](#函数的书写)
+* [函数调用](#函数调用)
+* [不要使用new方法](#不要使用new方法)
 * [间距](#间距)
 * [条件判断](#条件判断)
 	* [三目运算符](#三目运算符)
@@ -34,9 +37,10 @@
 * [方法](#方法)
 * [变量](#变量)
 * [命名](#命名)
+  * [分类](#分类)
 * [注释](#注释)
 * [Init 和 Dealloc](#init-和-dealloc)
-* [字面量](#字面量)
+* [直接常量](#字面量)
 * [CGRect 函数](#CGRect-函数)
 * [常量](#常量)
 * [枚举类型](#枚举类型)
@@ -45,10 +49,11 @@
 * [图片命名](#图片命名)
 * [布尔](#布尔)
 * [单例](#单例)
-* [导入](#导入)
+* [import](#import)
+* [协议](#协议)
 * [Xcode 工程](#Xcode-工程)
 
-## 点语法
+## 1.0点语法
 
 应该 **始终** 使用点语法来访问或者修改属性，访问其他实例时首选括号。
 
@@ -62,6 +67,88 @@ view.backgroundColor = [UIColor orangeColor];
 ```objc
 [view setBackgroundColor:[UIColor orangeColor]];
 UIApplication.sharedApplication.delegate;
+```
+
+## 函数的书写
+
+```objc
+- (void)writeVideoFrameWithData:(NSData *)frameData timeStamp:(int)timeStamp
+{
+    ...
+}
+```
+在-和(void)之间应该有一个空格，第一个大括号{ 单独占一行
+
+如果一个函数有特别多的参数或者名称很长，应该将其按照:来对齐分行显示：
+
+
+**推荐：**
+
+```objc
+- (void)short:(GTMFoo *)theFoo
+        longKeyword:(NSRect)theRect
+  evenLongerKeyword:(float)theInterval
+              error:(NSError **)theError {
+    ...
+}
+```
+
+**反对：**
+
+```objc
+- (void)short:(GTMFoo *)theFoo longKeyword:(NSRect)theRect evenLongerKeyword:(float)theInterval  error:(NSError **)theError {
+    ...
+}
+```
+
+## 函数调用
+
+**推荐：**
+
+```objc
+//写在一行
+[myObject doFooWith:arg1 name:arg2 error:arg3];
+
+//分行写，按照':'对齐
+[myObject doFooWith:arg1
+               name:arg2
+              error:arg3];
+
+//第一段名称过短的话后续可以进行缩进
+[myObj short:arg1
+          longKeyword:arg2
+    evenLongerKeyword:arg3
+                error:arg4];
+```
+
+**反对：**
+
+```objc
+//错误，要么写在一行，要么全部分行
+[myObject doFooWith:arg1 name:arg2
+              error:arg3];
+[myObject doFooWith:arg1
+               name:arg2 error:arg3];
+
+//错误，按照':'来对齐，而不是关键字
+[myObject doFooWith:arg1
+          name:arg2
+          error:arg3];
+```
+
+## 不要使用new方法
+
+尽管很多时候能用new代替alloc init方法，但这可能会导致调试内存时出现不可预料的问题。Cocoa的规范就是使用alloc init方法，使用new会让一些读者困惑。
+
+**推荐：**
+
+```objc
+MyClass *myClass = [[MyClass alloc] init];
+```
+
+**反对：**
+```objc
+MyClass *myClass = [MyClass new];
 ```
 
 ## 间距
@@ -156,7 +243,21 @@ if (error) {
 
 ## 变量
 
-变量名应该尽可能命名为描述性的。除了 `for()` 循环外，其他情况都应该避免使用单字母的变量名。
+变量命名应该具有明确的描述性。。
+
+例如：
+
+NSString *title：表示这个“title”是一个字符串。
+NSString *titleHTML：这表示可能包含需要解析显示的HTML的标题。程序员需要“HTML”才能有效地使用这个变量。
+NSAttributedString *titleAttributedString：已格式化为显示的标题。AttributedString提示这个值不只是一个普通标题，根据上下文，做出合理的选择。
+NSDate *now：无需进一步澄清。
+NSDate *lastModifiedDate：简单地lastModified可能是不明确; 根据上下文，可以合理地假设它是几种不同类型之一。
+NSURL *URL对比NSString *URLString：在情况下，当一个值可以合理由不同的类来表示，它通常是非常有用的变量名称来消除歧义。
+NSString *releaseDateString：另一个例子，其中值可以由另一个类表示，并且该名称可以帮助消除歧义。
+不推荐使用单字母变量名，除非在循环中作为简单的计数器变量。
+
+指示类型的星号是必须“附加到”变量名的指针。例如， NSString *text 不 NSString* text或NSString * text除了在常量的情况下（NSString * const NYTConstantString）。
+
 星号表示指针属于变量，例如：`NSString *text` 不要写成 `NSString* text` 或者 `NSString * text` ，常量除外。
 尽量定义属性来代替直接使用实例变量。除了初始化方法（`init`， `initWithCoder:`，等）， `dealloc` 方法和自定义的 setters 和 getters 内部，应避免直接访问实例变量。更多有关在初始化方法和 dealloc 方法中使用访问器方法的信息，参见[这里][Variables_1]。
 
@@ -240,12 +341,69 @@ id varnm;
 
 [Naming_2]:http://stackoverflow.com/a/2865194/340508
 
+## 分类
+
+推荐类别以简洁地分段功能，并应命名以描述该功能。
+
+**推荐：**
+
+```objc
+@interface UIViewController (NYTMediaPlaying)
+@interface NSString (NSStringEncodingDetection)
+```
+
+**反对：**
+
+```objc
+@interface NYTAdvertisement (private)
+@interface NSString (NYTAdditions)
+```
+
+在类别中添加的方法和属性必须使用应用程序或组织特定的前缀命名。这避免了无意地覆盖现有方法，并且减少了来自不同库的两个类别添加相同名称的方法的机会。（Objective-C运行时不指定在后一种情况下调用哪个方法，这可能导致意外的影响。）
+
+**推荐：**
+
+```objc
+@interface NSArray (NYTAccessors)
+- (id)nyt_objectOrNilAtIndex:(NSUInteger)index;
+@end
+```
+
+**反对：**
+
+```objc
+@interface NSArray (NYTAccessors)
+- (id)objectOrNilAtIndex:(NSUInteger)index;
+@end
+```
+
+
 ## 注释
 
 当需要的时候，注释应该被用来解释 **为什么** 特定代码做了某些事情。所使用的任何注释必须保持最新否则就删除掉。
 
 通常应该避免一大块注释，代码就应该尽量作为自身的文档，只需要隔几行写几句说明。这并不适用于那些用来生成文档的注释。
 
+**推荐：**
+
+```objc
+/**
+ *  Stop current preconnecting when application is going to background.
+ */
+-(void)stopRunning;
+
+/**
+ *  Get the COPY of cloud device with a given mac address.
+ *
+ *  @param macAddress Mac address of the device.
+ *
+ *  @return Instance of IPCCloudDevice.
+ */
+-(IPCCloudDevice *)getCloudDeviceWithMac:(NSString *)macAddress;
+```
+
+推荐使用[VVDocumenter](https://github.com/onevcat/VVDocumenter-Xcode)：
+![image](https://raw.github.com/onevcat/VVDocumenter-Xcode/master/ScreenShot.gif)
 
 ## init 和 dealloc
 
@@ -264,7 +422,7 @@ id varnm;
 }
 ```
 
-## 字面量
+## 直接常量
 
 每当创建 `NSString`， `NSDictionary`， `NSArray`，和 `NSNumber` 类的不可变实例时，都应该使用字面量。要注意 `nil` 值不能传给 `NSArray` 和 `NSDictionary` 字面量，这样做会导致崩溃。
 
@@ -395,9 +553,7 @@ NYTAdCategoryTechnology = 1 << 3
 
 ## 布尔
 
-因为 `nil` 解析为 `NO`，所以没有必要在条件中与它进行比较。永远不要直接和 `YES` 进行比较，因为 `YES` 被定义为 1，而 `BOOL` 可以多达 8 位。
-
-这使得整个文件有更多的一致性和更大的视觉清晰度。
+值不得进行直接比较YES，因为YES被定义为1，并且BOOL在Objective-C是一种CHAR类型是8位（所以值11111110将返回NO如果相比YES）。
 
 **推荐：**
 
@@ -420,12 +576,12 @@ if (someObject == nil) {
 ```objc
 if (isAwesome)
 if (![someObject boolValue])
+if (someNumber.boolValue == NO)
 ```
 
 **反对：**
 
 ```objc
-if ([someObject boolValue] == NO)
 if (isAwesome == YES) // 永远别这么做
 ```
 
@@ -462,7 +618,7 @@ if (isAwesome == YES) // 永远别这么做
 
 [Singletons_1]:http://cocoasamurai.blogspot.com/2011/04/singletons-your-doing-them-wrong.html
 
-## 导入   
+## import   
 
 如果有一个以上的 import 语句，就对这些语句进行[分组][Import_1]。每个分组的注释是可选的。   
 注：对于模块使用 [@import][Import_2] 语法。   
@@ -482,6 +638,31 @@ if (isAwesome == YES) // 永远别这么做
 
 [Import_1]: http://ashfurrow.com/blog/structuring-modern-objective-c
 [Import_2]: http://clang.llvm.org/docs/Modules.html#using-modules
+
+#协议
+
+一个类的Delegate对象通常还引用着类本身，这样很容易造成引用循环的问题，所以类的Delegate属性要设置为弱引用。
+
+**正确:**
+
+```objc
+@property (nonatomic, weak) id <IPCConnectHandlerDelegate> delegate;
+```
+
+回调方法写法
+
+**推荐：**
+
+```objc
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
+```
+
+**反对：**
+
+```objc
+- (void)didSelectTableRowAtIndexPath:(NSIndexPath *)indexPath;
+```
+
 
 ## Xcode 工程
 
@@ -507,4 +688,4 @@ if (isAwesome == YES) // 永远别这么做
 * [CocoaDevCentral](http://cocoadevcentral.com/articles/000082.php)
 * [Luke Redpath](http://lukeredpath.co.uk/blog/my-objective-c-style-guide.html)
 * [Marcus Zarra](http://www.cimgf.com/zds-code-style-guide/)
-
+* [Wikimedia](https://www.mediawiki.org/wiki/Wikimedia_Apps/Team/iOS/ObjectiveCStyleGuide)
