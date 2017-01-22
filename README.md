@@ -29,6 +29,7 @@
 * [点语法](#点语法)
 * [函数的书写](#函数的书写)
 * [函数调用](#函数调用)
+* [字典数组使用](#字典数组使用)
 * [不要使用new方法](#不要使用new方法)
 * [间距](#间距)
 * [条件判断](#条件判断)
@@ -40,7 +41,7 @@
   * [分类](#分类)
 * [注释](#注释)
 * [Init 和 Dealloc](#init-和-dealloc)
-* [直接常量](#字面量)
+* [直接常量](#直接常量)
 * [CGRect 函数](#CGRect-函数)
 * [常量](#常量)
 * [枚举类型](#枚举类型)
@@ -51,6 +52,7 @@
 * [单例](#单例)
 * [import](#import)
 * [协议](#协议)
+* [Block使用](#Block使用)
 * [Xcode 工程](#Xcode-工程)
 
 ## 1.0点语法
@@ -134,6 +136,47 @@ UIApplication.sharedApplication.delegate;
 [myObject doFooWith:arg1
           name:arg2
           error:arg3];
+```
+
+## 字典数组使用
+
+字典
+
+**推荐：**
+
+```objc
+    NSMutableDictionary *jsonDictionary = [NSMutableDictionary dictionary];
+    [jsonDictionary setObjectOrNil:value   forKey:@"key"];
+```
+
+**反对：**
+
+并未检查value是否为nil
+
+```objc
+    NSMutableDictionary *jsonDictionary = [NSMutableDictionary dictionary];
+    [jsonDictionary setObject:value   forKey:@"key"];
+```
+
+数组
+
+**推荐：**
+
+```objc
+    NSMutableArray *array = [NSMutableArray array];
+    [array addObjectOrNil:object];
+    [array insertObjectOrNil:object atIndex:index];
+    [array replaceObjectAtIndex:index withObjectOrNil:object];
+```
+
+
+**反对：**
+
+```objc
+    NSMutableArray *array = [NSMutableArray array];
+    [array addObject:object];
+    [array insertObject:object atIndex:index];
+    [array replaceObjectAtIndex:index withObject:object];
 ```
 
 ## 不要使用new方法
@@ -639,7 +682,7 @@ if (isAwesome == YES) // 永远别这么做
 [Import_1]: http://ashfurrow.com/blog/structuring-modern-objective-c
 [Import_2]: http://clang.llvm.org/docs/Modules.html#using-modules
 
-#协议
+# 协议
 
 一个类的Delegate对象通常还引用着类本身，这样很容易造成引用循环的问题，所以类的Delegate属性要设置为弱引用。
 
@@ -663,6 +706,54 @@ if (isAwesome == YES) // 永远别这么做
 - (void)didSelectTableRowAtIndexPath:(NSIndexPath *)indexPath;
 ```
 
+## Block使用
+
+**推荐：**
+
+```objc
+weakifyself;
+  [self executeBlock:^(NSData *data, NSError *error) {
+      strongifyself;
+      [self doSomethingWithData:data];
+  }];
+
+  或
+__weak __typeof(self) weakSelf = self;
+[self executeBlock:^(NSData *data, NSError *error) {
+    [weakSelf doSomethingWithData:data];
+}];
+
+```
+
+**禁止：**
+```objc
+[self executeBlock:^(NSData *data, NSError *error) {
+    [self doSomethingWithData:data];
+}];
+```
+多个语句的例子:
+
+**推荐：**
+```objc
+__weak __typeof(self)weakSelf = self;
+[self executeBlock:^(NSData *data, NSError *error) {
+    __strong __typeof(weakSelf) strongSelf = weakSelf;
+    if (strongSelf) {
+        [strongSelf doSomethingWithData:data];
+        [strongSelf doSomethingWithData:data];
+    }
+}];
+```
+
+**避免：**
+```objc
+__weak __typeof(self)weakSelf = self;
+[self executeBlock:^(NSData *data, NSError *error) {
+    [weakSelf doSomethingWithData:data];
+    [weakSelf doSomethingWithData:data];
+}];
+```
+
 
 ## Xcode 工程
 
@@ -678,8 +769,6 @@ if (isAwesome == YES) // 永远别这么做
 
 
 # 其他 Objective-C 风格指南
-
-如果感觉我们的不太符合你的口味，可以看看下面的风格指南：
 
 * [Google](http://google-styleguide.googlecode.com/svn/trunk/objcguide.xml)
 * [GitHub](https://github.com/github/objective-c-conventions)
