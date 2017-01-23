@@ -21,36 +21,6 @@
   * [命名常量](#命名常量)
   * [命名通知](#命名通知)
 
- 
-* [点语法](#点语法)
-* [函数的书写](#函数的书写)
-* [函数调用](#函数调用)
-* [字典数组使用](#字典数组使用)
-* [不要使用new方法](#不要使用new方法)
-* [间距](#间距)
-* [条件判断](#条件判断)
-	* [三目运算符](#三目运算符)
-* [错误处理](#错误处理)
-* [方法](#方法)
-* [变量](#变量)
-* [命名](#命名)
-  * [分类](#分类)
-* [注释](#注释)
-* [Init 和 Dealloc](#init-和-dealloc)
-* [直接常量](#直接常量)
-* [CGRect 函数](#CGRect-函数)
-* [常量](#常量)
-* [枚举类型](#枚举类型)
-* [位掩码](#位掩码)
-* [私有属性](#私有属性)
-* [图片命名](#图片命名)
-* [布尔](#布尔)
-* [单例](#单例)
-* [import](#import)
-* [协议](#协议)
-* [Block使用](#Block使用)
-* [Xcode 工程](#Xcode-工程)
-
 
 ## 命名
 ### 基本原则
@@ -433,7 +403,22 @@ NSWindowDidMiniaturizeNotification
 NSTextViewDidChangeSelectionNotification
 NSColorPanelColorDidChangeNotification
 ```
+### 图片命名
 
+1.用英文命名，不用拼音
+
+2.每一部分用'-'分隔。分割的第一个首字母大写。
+
+3.尽量表现内容+使用类型
+
+4.尽量同一页面放置在同一个文件夹下
+
+**推荐：**
+
+```objc
+Download-Progressbar-Highlighted@2x.png
+Download-Progressbar-Normal@2x.png
+```
 
 ##注释
 
@@ -973,7 +958,9 @@ if (great)
 
 除非想要兼容一些古董级的机器和操作系统，我们没有理由放弃使用ARC。在最新版的Xcode(6.2)中，ARC是自动打开的，所以直接使用就好了。
 
-###在init和dealloc中不要用存取方法访问实例变量
+###init和dealloc
+
+推荐的代码组织方式是将 dealloc 方法放在实现文件的最前面（直接在 @synthesize 以及 @dynamic 之后），init 应该跟在 dealloc 方法后面。
 
 当`init``dealloc`方法被执行时，类的运行时环境不是处于正常状态的，使用存取方法访问变量可能会导致不可预料的结果，因此应当在这两个方法内直接访问实例变量。
 
@@ -1004,6 +991,43 @@ if (great)
   [super dealloc];
 }
 ```
+
+### Designated 和 Secondary 初始化方法
+
+Objective-C 有指定初始化方法(designated initializer)和间接(secondary initializer)初始化方法的观念。 designated 初始化方法是提供所有的参数，secondary 初始化方法是一个或多个，并且提供一个或者更多的默认参数来调用 designated 初始化的初始化方法。
+
+
+```
+@implementation ZOCEvent
+
+- (instancetype)initWithTitle:(NSString *)title
+                         date:(NSDate *)date
+                     location:(CLLocation *)location
+{
+    self = [super init];
+    if (self) {
+        _title    = title;
+        _date     = date;
+        _location = location;
+    }
+    return self;
+}
+
+- (instancetype)initWithTitle:(NSString *)title
+                         date:(NSDate *)date
+{
+    return [self initWithTitle:title date:date location:nil];
+}
+
+- (instancetype)initWithTitle:(NSString *)title
+{
+    return [self initWithTitle:title date:[NSDate date] location:nil];
+}
+
+@end
+```
+
+initWithTitle:date:location: 就是 designated 初始化方法，另外的两个是 secondary 初始化方法。因为它们仅仅是调用类实现的 designated 初始化方法
 
 ###按照定义的顺序释放资源
 
@@ -1078,745 +1102,103 @@ array.release;
 @property (nonatomic, weak) id <IPCConnectHandlerDelegate> delegate;
 ```
 
+### 单例
+
+如果可能，请尽量避免使用单例而是依赖注入。 然而，如果一定要用，请使用一个线程安全的模式来创建共享的实例。对于 GCD，用 dispatch_once() 函数就可以咯。
 
 
-
-
-
-
-
-
-
-
-## 1.0点语法
-
-应该 **始终** 使用点语法来访问或者修改属性，访问其他实例时首选括号。
-
-**推荐：**
-```objc
-view.backgroundColor = [UIColor orangeColor];
-[UIApplication sharedApplication].delegate;
 ```
-
-**反对：**
-```objc
-[view setBackgroundColor:[UIColor orangeColor]];
-UIApplication.sharedApplication.delegate;
-```
-
-## 函数的书写
-
-```objc
-- (void)writeVideoFrameWithData:(NSData *)frameData timeStamp:(int)timeStamp
++ (instancetype)sharedInstance
 {
-    ...
-}
-```
-在-和(void)之间应该有一个空格，第一个大括号{ 单独占一行
-
-如果一个函数有特别多的参数或者名称很长，应该将其按照:来对齐分行显示：
-
-
-**推荐：**
-
-```objc
-- (void)short:(GTMFoo *)theFoo
-        longKeyword:(NSRect)theRect
-  evenLongerKeyword:(float)theInterval
-              error:(NSError **)theError {
-    ...
-}
-```
-
-**反对：**
-
-```objc
-- (void)short:(GTMFoo *)theFoo longKeyword:(NSRect)theRect evenLongerKeyword:(float)theInterval  error:(NSError **)theError {
-    ...
-}
-```
-
-## 函数调用
-
-**推荐：**
-
-```objc
-//写在一行
-[myObject doFooWith:arg1 name:arg2 error:arg3];
-
-//分行写，按照':'对齐
-[myObject doFooWith:arg1
-               name:arg2
-              error:arg3];
-
-//第一段名称过短的话后续可以进行缩进
-[myObj short:arg1
-          longKeyword:arg2
-    evenLongerKeyword:arg3
-                error:arg4];
-```
-
-**反对：**
-
-```objc
-//错误，要么写在一行，要么全部分行
-[myObject doFooWith:arg1 name:arg2
-              error:arg3];
-[myObject doFooWith:arg1
-               name:arg2 error:arg3];
-
-//错误，按照':'来对齐，而不是关键字
-[myObject doFooWith:arg1
-          name:arg2
-          error:arg3];
-```
-
-## 字典数组使用
-
-字典
-
-**推荐：**
-
-```objc
-    NSMutableDictionary *jsonDictionary = [NSMutableDictionary dictionary];
-    [jsonDictionary setObjectOrNil:value   forKey:@"key"];
-```
-
-**反对：**
-
-并未检查value是否为nil
-
-```objc
-    NSMutableDictionary *jsonDictionary = [NSMutableDictionary dictionary];
-    [jsonDictionary setObject:value   forKey:@"key"];
-```
-
-数组
-
-**推荐：**
-
-```objc
-    NSMutableArray *array = [NSMutableArray array];
-    [array addObjectOrNil:object];
-    [array insertObjectOrNil:object atIndex:index];
-    [array replaceObjectAtIndex:index withObjectOrNil:object];
-```
-
-
-**反对：**
-
-```objc
-    NSMutableArray *array = [NSMutableArray array];
-    [array addObject:object];
-    [array insertObject:object atIndex:index];
-    [array replaceObjectAtIndex:index withObject:object];
-```
-
-## 不要使用new方法
-
-尽管很多时候能用new代替alloc init方法，但这可能会导致调试内存时出现不可预料的问题。Cocoa的规范就是使用alloc init方法，使用new会让一些读者困惑。
-
-**推荐：**
-
-```objc
-MyClass *myClass = [[MyClass alloc] init];
-```
-
-**反对：**
-```objc
-MyClass *myClass = [MyClass new];
-```
-
-## 间距
-
-* 一个缩进使用 4 个空格，永远不要使用制表符（tab）缩进。请确保在 Xcode 中设置了此偏好。
-* 方法的大括号和其他的大括号（`if`/`else`/`switch`/`while` 等等）始终和声明在同一行开始，在新的一行结束。
-
-**推荐：**
-```objc
-if (user.isHappy) {
-// Do something
-}
-else {
-// Do something else
-}
-```
-* 方法之间应该正好空一行，这有助于视觉清晰度和代码组织性。在方法中的功能块之间应该使用空白分开，但往往可能应该创建一个新的方法。
-* `@synthesize` 和 `@dynamic` 在实现中每个都应该占一个新行。
-
-
-## 条件判断
-
-条件判断主体部分应该始终使用大括号括住来防止[出错][Condiationals_1]，即使它可以不用大括号（例如它只需要一行）。这些错误包括添加第二行（代码）并希望它是 if 语句的一部分时。还有另外一种[更危险的][Condiationals_2]，当 if 语句里面的一行被注释掉，下一行就会在不经意间成为了这个 if 语句的一部分。此外，这种风格也更符合所有其他的条件判断，因此也更容易检查。
-
-**推荐：**
-```objc
-if (!error) {
-    return success;
-}
-```
-
-**反对：**
-```objc
-if (!error)
-    return success;
-```
-
-或
-
-```objc
-if (!error) return success;
-```
-
-
-[Condiationals_1]:(https://github.com/NYTimes/objective-c-style-guide/issues/26#issuecomment-22074256)
-[Condiationals_2]:http://programmers.stackexchange.com/a/16530
-
-### 三目运算符
-
-三目运算符，? ，只有当它可以增加代码清晰度或整洁时才使用。单一的条件都应该优先考虑使用。多条件时通常使用 if 语句会更易懂，或者重构为实例变量。
-
-**推荐：**
-```objc
-result = a > b ? x : y;
-```
-
-**反对：**
-```objc
-result = a > b ? x = c > d ? c : d : y;
-```
-
-## 错误处理
-
-当引用一个返回错误参数（error parameter）的方法时，应该针对返回值，而非错误变量。
-
-**推荐：**
-```objc
-NSError *error;
-if (![self trySomethingWithError:&error]) {
-    // 处理错误
-}
-```
-
-**反对：**
-```objc
-NSError *error;
-[self trySomethingWithError:&error];
-if (error) {
-    // 处理错误
-}
-```
-一些苹果的 API 在成功的情况下会写一些垃圾值给错误参数（如果非空），所以针对错误变量可能会造成虚假结果（以及接下来的崩溃）。
-
-## 方法
-
-在方法签名中，在 -/+ 符号后应该有一个空格。方法片段之间也应该有一个空格。
-
-**推荐：**
-```objc
-- (void)setExampleText:(NSString *)text image:(UIImage *)image;
-```
-
-## 变量
-
-变量命名应该具有明确的描述性。。
-
-例如：
-
-NSString *title：表示这个“title”是一个字符串。
-
-NSString *titleHTML：这表示可能包含需要解析显示的HTML的标题。程序员需要“HTML”才能有效地使用这个变量。
-
-NSAttributedString *titleAttributedString：已格式化为显示的标题。AttributedString提示这个值不只是一个普通标题，根据上下文，做出合理的选择。
-
-NSDate *now：无需进一步澄清。
-
-NSDate *lastModifiedDate：简单地lastModified可能是不明确; 根据上下文，可以合理地假设它是几种不同类型之一。
-
-NSURL *URL对比NSString *URLString：在情况下，当一个值可以合理由不同的类来表示，它通常是非常有用的变量名称来消除歧义。
-
-NSString *releaseDateString：另一个例子，其中值可以由另一个类表示，并且该名称可以帮助消除歧义。
-
-不推荐使用单字母变量名，除非在循环中作为简单的计数器变量。
-
-指示类型的星号是必须“附加到”变量名的指针。例如， NSString *text 不 NSString* text或NSString * text除了在常量的情况下（NSString * const NYTConstantString）。
-
-星号表示指针属于变量，例如：`NSString *text` 不要写成 `NSString* text` 或者 `NSString * text` ，常量除外。
-
-尽量定义属性来代替直接使用实例变量。除了初始化方法（`init`， `initWithCoder:`，等）， `dealloc` 方法和自定义的 setters 和 getters 内部，应避免直接访问实例变量。更多有关在初始化方法和 dealloc 方法中使用访问器方法的信息，参见[这里][Variables_1]。
-
-
-**推荐：**
-
-```objc
-@interface NYTSection: NSObject
-
-@property (nonatomic) NSString *headline;
-
-@end
-```
-
-**反对：**
-
-```objc
-@interface NYTSection : NSObject {
-    NSString *headline;
-}
-```
-
-[Variables_1]:https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/MemoryMgmt/Articles/mmPractical.html#//apple_ref/doc/uid/TP40004447-SW6
-
-#### 变量限定符
-
-当涉及到[在 ARC 中被引入][Variable_Qualifiers_1]变量限定符时，
-限定符 (`__strong`, `__weak`, `__unsafe_unretained`, `__autoreleasing`) 应该位于星号和变量名之间，如：`NSString * __weak text`。
-
-[Variable_Qualifiers_1]:(https://developer.apple.com/library/ios/releasenotes/objectivec/rn-transitioningtoarc/Introduction/Introduction.html#//apple_ref/doc/uid/TP40011226-CH1-SW4)
-
-## 命名
-
-应使用驼峰命名法命名
-
-尽可能遵守苹果的命名约定，尤其那些涉及到[内存管理规则][Naming_1]，（[NARC][Naming_2]）的。
-
-**推荐：**
-
-```objc
-UIButton *settingsButton;
-```
-
-**反对：**
-
-```objc
-UIButton *setBut;
-```
-类名和常量应该始终使用三个字母的前缀（例如 `NYT`），但 Core Data 实体名称可以省略。为了代码清晰，常量应该使用相关类的名字作为前缀并使用驼峰命名法。
-
-**推荐：**
-
-```objc
-static const NSTimeInterval NYTArticleViewControllerNavigationFadeAnimationDuration = 0.3;
-```
-
-**反对：**
-
-```objc
-static const NSTimeInterval fadetime = 1.7;
-```
-
-属性和局部变量应该使用驼峰命名法并且首字母小写。
-
-为了保持一致，实例变量应该使用驼峰命名法命名，并且首字母小写，以下划线为前缀。这与 LLVM 自动合成的实例变量相一致。
-**如果 LLVM 可以自动合成变量，那就让它自动合成。**
-
-**推荐：**
-
-```objc
-@synthesize descriptiveVariableName = _descriptiveVariableName;
-```
-
-**反对：**
-
-```objc
-id varnm;
-```
-
-[Naming_1]:https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/MemoryMgmt/Articles/MemoryMgmt.html
-
-[Naming_2]:http://stackoverflow.com/a/2865194/340508
-
-## 分类
-
-推荐类别以简洁地分段功能，并应命名以描述该功能。
-
-**推荐：**
-
-```objc
-@interface UIViewController (NYTMediaPlaying)
-@interface NSString (NSStringEncodingDetection)
-```
-
-**反对：**
-
-```objc
-@interface NYTAdvertisement (private)
-@interface NSString (NYTAdditions)
-```
-
-在类别中添加的方法和属性必须使用应用程序或组织特定的前缀命名。这避免了无意地覆盖现有方法，并且减少了来自不同库的两个类别添加相同名称的方法的机会。（Objective-C运行时不指定在后一种情况下调用哪个方法，这可能导致意外的影响。）
-
-**推荐：**
-
-```objc
-@interface NSArray (NYTAccessors)
-- (id)nyt_objectOrNilAtIndex:(NSUInteger)index;
-@end
-```
-
-**反对：**
-
-```objc
-@interface NSArray (NYTAccessors)
-- (id)objectOrNilAtIndex:(NSUInteger)index;
-@end
-```
-
-
-## 注释
-
-当需要的时候，注释应该被用来解释 **为什么** 特定代码做了某些事情。所使用的任何注释必须保持最新否则就删除掉。
-
-通常应该避免一大块注释，代码就应该尽量作为自身的文档，只需要隔几行写几句说明。这并不适用于那些用来生成文档的注释。
-
-**推荐：**
-
-```objc
-/**
- *  Stop current preconnecting when application is going to background.
- */
--(void)stopRunning;
-
-/**
- *  Get the COPY of cloud device with a given mac address.
- *
- *  @param macAddress Mac address of the device.
- *
- *  @return Instance of IPCCloudDevice.
- */
--(IPCCloudDevice *)getCloudDeviceWithMac:(NSString *)macAddress;
-```
-
-推荐使用[VVDocumenter](https://github.com/onevcat/VVDocumenter-Xcode)：
-![image](https://raw.github.com/onevcat/VVDocumenter-Xcode/master/ScreenShot.gif)
-
-## init 和 dealloc
-
-`dealloc` 方法应该放在实现文件的最上面，并且刚好在 `@synthesize` 和 `@dynamic` 语句的后面。在任何类中，`init` 都应该直接放在 `dealloc` 方法的下面。
-
-`init` 方法的结构应该像这样：
-
-```objc
-- (instancetype)init {
-    self = [super init]; // 或者调用指定的初始化方法
-    if (self) {
-        // Custom initialization
-    }
-
-    return self;
-}
-```
-
-## 直接常量
-
-每当创建 `NSString`， `NSDictionary`， `NSArray`，和 `NSNumber` 类的不可变实例时，都应该使用字面量。要注意 `nil` 值不能传给 `NSArray` 和 `NSDictionary` 字面量，这样做会导致崩溃。
-
-**推荐：**
-
-```objc
-NSArray *names = @[@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul"];
-NSDictionary *productManagers = @{@"iPhone" : @"Kate", @"iPad" : @"Kamal", @"Mobile Web" : @"Bill"};
-NSNumber *shouldUseLiterals = @YES;
-NSNumber *buildingZIPCode = @10018;
-```
-
-**反对：**
-
-```objc
-NSArray *names = [NSArray arrayWithObjects:@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul", nil];
-NSDictionary *productManagers = [NSDictionary dictionaryWithObjectsAndKeys: @"Kate", @"iPhone", @"Kamal", @"iPad", @"Bill", @"Mobile Web", nil];
-NSNumber *shouldUseLiterals = [NSNumber numberWithBool:YES];
-NSNumber *buildingZIPCode = [NSNumber numberWithInteger:10018];
-```
-
-## CGRect 函数
-
-当访问一个 `CGRect` 的 `x`， `y`， `width`， `height` 时，应该使用[`CGGeometry` 函数][CGRect-Functions_1]代替直接访问结构体成员。苹果的 `CGGeometry` 参考中说到：
-
-> All functions described in this reference that take CGRect data structures as inputs implicitly standardize those rectangles before calculating their results. For this reason, your applications should avoid directly reading and writing the data stored in the CGRect data structure. Instead, use the functions described here to manipulate rectangles and to retrieve their characteristics.
-
-**推荐：**
-
-```objc
-CGRect frame = self.view.frame;
-
-CGFloat x = CGRectGetMinX(frame);
-CGFloat y = CGRectGetMinY(frame);
-CGFloat width = CGRectGetWidth(frame);
-CGFloat height = CGRectGetHeight(frame);
-```
-
-**反对：**
-
-```objc
-CGRect frame = self.view.frame;
-
-CGFloat x = frame.origin.x;
-CGFloat y = frame.origin.y;
-CGFloat width = frame.size.width;
-CGFloat height = frame.size.height;
-```
-
-[CGRect-Functions_1]:http://developer.apple.com/library/ios/#documentation/graphicsimaging/reference/CGGeometry/Reference/reference.html
-
-## 常量
-
-常量首选内联字符串字面量或数字，因为常量可以轻易重用并且可以快速改变而不需要查找和替换。常量应该声明为 `static` 常量而不是 `#define` ，除非非常明确地要当做宏来使用。
-
-**推荐：**
-
-```objc
-static NSString * const NYTAboutViewControllerCompanyName = @"The New York Times Company";
-
-static const CGFloat NYTImageThumbnailHeight = 50.0;
-```
-
-**反对：**
-
-```objc
-#define CompanyName @"The New York Times Company"
-
-#define thumbnailHeight 2
-```
-
-## 枚举类型
-
-当使用 `enum` 时，建议使用新的基础类型规范，因为它具有更强的类型检查和代码补全功能。现在 SDK 包含了一个宏来鼓励使用使用新的基础类型 - `NS_ENUM()`
-
-**推荐：**
-
-```objc
-typedef NS_ENUM(NSInteger, NYTAdRequestState) {
-    NYTAdRequestStateInactive,
-    NYTAdRequestStateLoading
-};
-```
-
-## 位掩码
-
-当用到位掩码时，使用 `NS_OPTIONS` 宏。
-
-**举例：**
-
-```objc
-typedef NS_OPTIONS(NSUInteger, NYTAdCategory) {
-NYTAdCategoryAutos      = 1 << 0,
-NYTAdCategoryJobs       = 1 << 1,
-NYTAdCategoryRealState  = 1 << 2,
-NYTAdCategoryTechnology = 1 << 3
-};
-```
-
-
-## 私有属性
-
-私有属性应该声明在类实现文件的延展（匿名的类目）中。有名字的类目（例如 `NYTPrivate` 或 `private`）永远都不应该使用，除非要扩展其他类。
-
-**推荐：**
-
-```objc
-@interface NYTAdvertisement ()
-
-@property (nonatomic, strong) GADBannerView *googleAdView;
-@property (nonatomic, strong) ADBannerView *iAdView;
-@property (nonatomic, strong) UIWebView *adXWebView;
-
-@end
-```
-
-## 图片命名
-
-1.用英文命名，不用拼音
-
-2.每一部分用'-'分隔。分割的第一个首字母大写。
-
-3.尽量表现内容+使用类型
-
-4.尽量同一页面放置在同一个文件夹下
-
-**推荐：**
-
-```objc
-Download-Progressbar-Highlighted@2x.png
-Download-Progressbar-Normal@2x.png
-```
-
-
-
-## 布尔
-
-值不得进行直接比较YES，因为YES被定义为1，并且BOOL在Objective-C是一种CHAR类型是8位（所以值11111110将返回NO如果相比YES）。
-
-**推荐：**
-
-```objc
-if (!someObject) {
-}
-```
-
-**反对：**
-
-```objc
-if (someObject == nil) {
-}
-```
-
------
-
-**对于 `BOOL` 来说, 这有两种用法:**
-
-```objc
-if (isAwesome)
-if (![someObject boolValue])
-if (someNumber.boolValue == NO)
-```
-
-**反对：**
-
-```objc
-if (isAwesome == YES) // 永远别这么做
-```
-
------
-
-如果一个 `BOOL` 属性名称是一个形容词，属性可以省略 “is” 前缀，但为 get 访问器指定一个惯用的名字，例如：
-
-```objc
-@property (assign, getter=isEditable) BOOL editable;
-```
-
-内容和例子来自 [Cocoa 命名指南][Booleans_1] 。
-
-[Booleans_1]:https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CodingGuidelines/Articles/NamingIvarsAndTypes.html#//apple_ref/doc/uid/20001284-BAJGIIJE
-
-
-## 单例
-
-单例对象应该使用线程安全的模式创建共享的实例。
-
-```objc
-+ (instancetype)sharedInstance {
    static id sharedInstance = nil;
-
-   static dispatch_once_t onceToken;
+   static dispatch_once_t onceToken = 0;
    dispatch_once(&onceToken, ^{
       sharedInstance = [[self alloc] init];
    });
-
    return sharedInstance;
 }
 ```
-这将会预防[有时可能产生的许多崩溃][Singletons_1]。
+### KVO
 
-[Singletons_1]:http://cocoasamurai.blogspot.com/2011/04/singletons-your-doing-them-wrong.html
+### 参数断言
 
-## import   
-
-如果有一个以上的 import 语句，就对这些语句进行[分组][Import_1]。每个分组的注释是可选的。   
-注：对于模块使用 [@import][Import_2] 语法。   
-
-```objc   
-// Frameworks
-@import QuartzCore;
-
-// Models
-#import "NYTUser.h"
-
-// Views
-#import "NYTButton.h"
-#import "NYTUserView.h"
-```   
+你的方法可能要求一些参数来满足特定的条件（比如不能为nil），在这种情况下最好使用 NSParameterAssert() 来断言条件是否成立或是抛出一个异常。
 
 
-[Import_1]: http://ashfurrow.com/blog/structuring-modern-objective-c
-[Import_2]: http://clang.llvm.org/docs/Modules.html#using-modules
+Categories
+虽然我们知道这样写很丑, 但是我们应该要在我们的 category 方法前加上自己的小写前缀以及下划线，比如- (id)zoc_myCategoryMethod。 这种实践同样被苹果推荐。
 
-# 协议
+这是非常必要的。因为如果在扩展的 category 或者其他 category 里面已经使用了同样的方法名，会导致不可预计的后果。实际上，实际被调用的是最后被加载的那个 category 中方法的实现(译者注：如果导入的多个 category 中有一些同名的方法导入到类里时，最终调用哪个是由编译时的加载顺序来决定的，最后一个加载进来的方法会覆盖之前的方法)。
 
-一个类的Delegate对象通常还引用着类本身，这样很容易造成引用循环的问题，所以类的Delegate属性要设置为弱引用。
+如果想要确认你的分类方法没有覆盖其他实现的话，可以把环境变量 OBJC_PRINT_REPLACED_METHODS 设置为 YES，这样那些被取代的方法名字会打印到 Console 中。现在 LLVM 5.1 不会为此发出任何警告和错误提示，所以自己小心不要在分类中重载方法。
 
-**正确:**
+一个好的实践是在 category 名中使用前缀。
 
-```objc
-@property (nonatomic, weak) id <IPCConnectHandlerDelegate> delegate;
-```
+** 例子 **
 
-回调方法写法
-
-**推荐：**
-
-```objc
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath;
-```
-
-**反对：**
-
-```objc
-- (void)didSelectTableRowAtIndexPath:(NSIndexPath *)indexPath;
-```
-
-## Block使用
-
-**推荐：**
-
-```objc
-weakifyself;
-  [self executeBlock:^(NSData *data, NSError *error) {
-      strongifyself;
-      [self doSomethingWithData:data];
-  }];
-
-  或
-__weak __typeof(self) weakSelf = self;
-[self executeBlock:^(NSData *data, NSError *error) {
-    [weakSelf doSomethingWithData:data];
-}];
 
 ```
+@interface NSDate (ZOCTimeExtensions)
+- (NSString *)zoc_timeAgoShort;
+@end
+** 不要这样 **
 
-**禁止：**
-```objc
-[self executeBlock:^(NSData *data, NSError *error) {
-    [self doSomethingWithData:data];
-}];
-```
-多个语句的例子:
-
-**推荐：**
-```objc
-__weak __typeof(self)weakSelf = self;
-[self executeBlock:^(NSData *data, NSError *error) {
-    __strong __typeof(weakSelf) strongSelf = weakSelf;
-    if (strongSelf) {
-        [strongSelf doSomethingWithData:data];
-        [strongSelf doSomethingWithData:data];
-    }
-}];
+@interface NSDate (ZOCTimeExtensions)
+- (NSString *)timeAgoShort;
+@end
 ```
 
-**避免：**
-```objc
-__weak __typeof(self)weakSelf = self;
-[self executeBlock:^(NSData *data, NSError *error) {
-    [weakSelf doSomethingWithData:data];
-    [weakSelf doSomethingWithData:data];
-}];
+分类可以用来在头文件中定义一组功能相似的方法。这是在 Apple的 Framework 也很常见的一个实践（下面例子的取自NSDate 头文件）。我们也强烈建议在自己的代码中这样使用。
+
+我们的经验是，创建一组分类对以后的重构十分有帮助。一个类的接口增加的时候，可能意味着你的类做了太多事情，违背了类的单一功能原则。
+
+之前创造的方法分组可以用来更好地进行不同功能的表示，并且把类打破在更多自我包含的组成部分里。
+
+
+```
+@interface NSDate : NSObject <NSCopying, NSSecureCoding>
+
+@property (readonly) NSTimeInterval timeIntervalSinceReferenceDate;
+
+@end
+
+@interface NSDate (NSDateCreation)
+
++ (instancetype)date;
++ (instancetype)dateWithTimeIntervalSinceNow:(NSTimeInterval)secs;
++ (instancetype)dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)ti;
++ (instancetype)dateWithTimeIntervalSince1970:(NSTimeInterval)secs;
++ (instancetype)dateWithTimeInterval:(NSTimeInterval)secsToBeAdded sinceDate:(NSDate *)date;
+// ...
+@end
 ```
 
 
-## Xcode 工程
+Pragma
 
-为了避免文件杂乱，物理文件应该保持和 Xcode 项目文件同步。Xcode 创建的任何组（group）都必须在文件系统有相应的映射。为了更清晰，代码不仅应该按照类型进行分组，也可以根据功能进行分组。
+Pragma Mark
+
+#pragma mark - 是一个在类内部组织代码并且帮助你分组方法实现的好办法。 我们建议使用 #pragma mark - 来分离:
+
+不同功能组的方法
+protocols 的实现
+对父类方法的重写
+- (void)dealloc { /* ... */ }
+- (instancetype)init { /* ... */ }
+
+#pragma mark - View Lifecycle （View 的生命周期）
+
+- (void)viewDidLoad { /* ... */ }
+- (void)viewWillAppear:(BOOL)animated { /* ... */ }
+- (void)didReceiveMemoryWarning { /* ... */ }
 
 
-如果可以的话，尽可能一直打开 target Build Settings 中 "Treat Warnings as Errors" 以及一些[额外的警告][Xcode-project_1]。如果你需要忽略指定的警告,使用 [Clang 的编译特性][Xcode-project_2] 。
+
+---
+
+---
 
 
-[Xcode-project_1]:http://boredzo.org/blog/archives/2009-11-07/warnings
-
-[Xcode-project_2]:http://clang.llvm.org/docs/UsersManual.html#controlling-diagnostics-via-pragmas
-
-
-## 介绍
 
 关于这个编程语言的所有规范，如果这里没有写到，那就在苹果的文档里： 
 
