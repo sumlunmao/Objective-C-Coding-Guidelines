@@ -13,6 +13,13 @@
 * [命名](#命名)
   * [基本原则](#基本原则)
   * [命名类和协议](#命名类和协议)
+  * [命名头文件](#命名头文件)
+  * [命名委法](#命名委托)
+  * [集合操作类方法](#集合操作类方法)
+  * [命名函数](#命名函数)
+  * [命名属性和实例变量数](#命名属性和实例变量)
+  * [命名常量](#命名常量)
+  * [命名通知](#命名通知)
 
  
 * [点语法](#点语法)
@@ -417,11 +424,555 @@ NSColorPanelColorDidChangeNotification
 ```
 
 
+##注释
+
+读没有注释代码的痛苦你我都体会过，好的注释不仅能让人轻松读懂你的程序，还能提升代码的逼格。注意注释是为了让别人看懂，而不是仅仅你自己。
+
+###文件注释
+
+每一个文件都**必须**写文件注释，文件注释通常包含
+
+- 文件所在模块
+- 作者信息
+- 历史版本信息
+- 版权信息
+- 文件包含的内容，作用
+
+一段良好文件注释的栗子：
+
+```objective-c
+/*******************************************************************************
+	Copyright (C), 2011-2013, Andrew Min Chang
+
+	File name: 	AMCCommonLib.h
+	Author:		Andrew Chang (Zhang Min) 
+	E-mail:		LaplaceZhang@126.com
+	
+	Description: 	
+			This file provide some covenient tool in calling library tools. One can easily include 
+		library headers he wants by declaring the corresponding macros. 
+			I hope this file is not only a header, but also a useful Linux library note.
+			
+	History:
+		2012-??-??: On about come date around middle of Year 2012, file created as "commonLib.h"
+		2012-08-20: Add shared memory library; add message queue.
+		2012-08-21: Add socket library (local)
+		2012-08-22: Add math library
+		2012-08-23: Add socket library (internet)
+		2012-08-24: Add daemon function
+		2012-10-10: Change file name as "AMCCommonLib.h"
+		2012-12-04: Add UDP support in AMC socket library
+		2013-01-07: Add basic data type such as "sint8_t"
+		2013-01-18: Add CFG_LIB_STR_NUM.
+		2013-01-22: Add CFG_LIB_TIMER.
+		2013-01-22: Remove CFG_LIB_DATA_TYPE because there is already AMCDataTypes.h
+
+	Copyright information: 
+			This file was intended to be under GPL protocol. However, I may use this library
+		in my work as I am an employee. And my company may require me to keep it secret. 
+		Therefore, this file is neither open source nor under GPL control. 
+		
+********************************************************************************/
+```
+
+*文件注释的格式通常不作要求，能清晰易读就可以了，但在整个工程中风格要统一。*
+
+###代码注释
+
+好的代码应该是“自解释”（self-documenting）的，但仍然需要详细的注释来说明参数的意义、返回值、功能以及可能的副作用。
+
+方法、函数、类、协议、类别的定义都需要注释，推荐采用Apple的标准注释风格，好处是可以在引用的地方`alt+点击`自动弹出注释，非常方便。
+
+有很多可以自动生成注释格式的插件，推荐使用[VVDocumenter](https://github.com/onevcat/VVDocumenter-Xcode)：
+
+![Screenshot](https://raw.github.com/onevcat/VVDocumenter-Xcode/master/ScreenShot.gif)
+
+一些良好的注释：
+
+```objective-c
+/**
+ *  Create a new preconnector to replace the old one with given mac address.
+ *  NOTICE: We DO NOT stop the old preconnector, so handle it by yourself.
+ *
+ *  @param type       Connect type the preconnector use.
+ *  @param macAddress Preconnector's mac address.
+ */
+- (void)refreshConnectorWithConnectType:(IPCConnectType)type  Mac:(NSString *)macAddress;
+
+/**
+ *  Stop current preconnecting when application is going to background.
+ */
+-(void)stopRunning;
+
+/**
+ *  Get the COPY of cloud device with a given mac address.
+ *
+ *  @param macAddress Mac address of the device.
+ *
+ *  @return Instance of IPCCloudDevice.
+ */
+-(IPCCloudDevice *)getCloudDeviceWithMac:(NSString *)macAddress;
+
+// A delegate for NSApplication to handle notifications about app
+// launch and shutdown. Owned by the main app controller.
+@interface MyAppDelegate : NSObject {
+  ...
+}
+@end
+```
+
+协议、委托的注释要明确说明其被触发的条件：
+
+```objective-c
+/** Delegate - Sent when failed to init connection, like p2p failed. */
+-(void)initConnectionDidFailed:(IPCConnectHandler *)handler;
+```
+
+如果在注释中要引用参数名或者方法函数名，使用`||`将参数或者方法括起来以避免歧义：
+
+```objective-c
+// Sometimes we need |count| to be less than zero.
+
+// Remember to call |StringWithoutSpaces("foo bar baz")|
+```
+
+**定义在头文件里的接口方法、属性必须要有注释！**
 
 
+##代码格式
+
+###使用空格而不是制表符Tab
+
+不要在工程里使用Tab键，使用空格来进行缩进。在`Xcode > Preferences > Text Editing`将Tab和自动缩进都设置为**4**个空格。（_Google的标准是使用两个空格来缩进，但这里还是推荐使用Xcode默认的设置。_）
+
+###每一行的最大长度
+
+同样的，在`Xcode > Preferences > Text Editing > Page guide at column:`中将最大行长设置为**80**，过长的一行代码将会导致可读性问题。
+
+###函数的书写
+
+一个典型的Objective-C函数应该是这样的：
+
+```objective-c
+- (void)writeVideoFrameWithData:(NSData *)frameData timeStamp:(int)timeStamp {
+    ...
+}
+```
+
+在`-`和`(void)`之间应该有一个空格，第一个大括号`{`的位置在函数所在行的末尾，同样应该有一个空格。（_我司的C语言规范要求是第一个大括号单独占一行，但考虑到OC较长的函数名和苹果SDK代码的风格，还是将大括号放在行末。_）
+
+如果一个函数有特别多的参数或者名称很长，应该将其按照`:`来对齐分行显示：
+
+```objective-c
+-(id)initWithModel:(IPCModle)model
+       ConnectType:(IPCConnectType)connectType
+        Resolution:(IPCResolution)resolution
+          AuthName:(NSString *)authName
+          Password:(NSString *)password
+               MAC:(NSString *)mac
+              AzIp:(NSString *)az_ip
+             AzDns:(NSString *)az_dns
+             Token:(NSString *)token
+             Email:(NSString *)email
+          Delegate:(id<IPCConnectHandlerDelegate>)delegate;
+```
+
+在分行时，如果第一段名称过短，后续名称可以以Tab的长度（4个空格）为单位进行缩进：
+
+```objective-c
+- (void)short:(GTMFoo *)theFoo
+        longKeyword:(NSRect)theRect
+  evenLongerKeyword:(float)theInterval
+              error:(NSError **)theError {
+    ...
+}
+```
+###函数调用
+
+函数调用的格式和书写差不多，可以按照函数的长短来选择写在一行或者分成多行：
+
+```objective-c
+//写在一行
+[myObject doFooWith:arg1 name:arg2 error:arg3];
+
+//分行写，按照':'对齐
+[myObject doFooWith:arg1
+               name:arg2
+              error:arg3];
+
+//第一段名称过短的话后续可以进行缩进
+[myObj short:arg1
+          longKeyword:arg2
+    evenLongerKeyword:arg3
+                error:arg4];
+```
+
+以下写法是错误的：
+
+```objective-c
+//错误，要么写在一行，要么全部分行
+[myObject doFooWith:arg1 name:arg2
+              error:arg3];
+[myObject doFooWith:arg1
+               name:arg2 error:arg3];
+
+//错误，按照':'来对齐，而不是关键字
+[myObject doFooWith:arg1
+          name:arg2
+          error:arg3];
+```
+
+###@public和@private标记符
+
+@public和@private标记符应该以**一个空格**来进行缩进：
+
+```objective-c
+@interface MyClass : NSObject {
+ @public
+  ...
+ @private
+  ...
+}
+@end
+```
+
+###协议（Protocols）
+
+在书写协议的时候注意用`<>`括起来的协议和类型名之间是没有空格的，比如`IPCConnectHandler()<IPCPreconnectorDelegate>`,这个规则适用所有书写协议的地方，包括函数声明、类声明、实例变量等等：
+
+```objective-c
+@interface MyProtocoledClass : NSObject<NSWindowDelegate> {
+ @private
+    id<MyFancyDelegate> _delegate;
+}
+
+- (void)setDelegate:(id<MyFancyDelegate>)aDelegate;
+@end
+```
+
+###闭包（Blocks）
+
+根据block的长度，有不同的书写规则：
+
+- 较短的block可以写在一行内。
+- 如果分行显示的话，block的右括号`}`应该和调用block那行代码的第一个非空字符对齐。
+- block内的代码采用**4个空格**的缩进。
+- 如果block过于庞大，应该单独声明成一个变量来使用。
+- `^`和`(`之间，`^`和`{`之间都没有空格，参数列表的右括号`)`和`{`之间有一个空格。
+
+```objective-c
+//较短的block写在一行内
+[operation setCompletionBlock:^{ [self onOperationDone]; }];
+
+//分行书写的block，内部使用4空格缩进
+[operation setCompletionBlock:^{
+    [self.delegate newDataAvailable];
+}];
+
+//使用C语言API调用的block遵循同样的书写规则
+dispatch_async(_fileIOQueue, ^{
+    NSString* path = [self sessionFilePath];
+    if (path) {
+      // ...
+    }
+});
+
+//较长的block关键字可以缩进后在新行书写，注意block的右括号'}'和调用block那行代码的第一个非空字符对齐
+[[SessionService sharedService]
+    loadWindowWithCompletionBlock:^(SessionWindow *window) {
+        if (window) {
+          [self windowDidLoad:window];
+        } else {
+          [self errorLoadingWindow];
+        }
+    }];
+
+//较长的block参数列表同样可以缩进后在新行书写
+[[SessionService sharedService]
+    loadWindowWithCompletionBlock:
+        ^(SessionWindow *window) {
+            if (window) {
+              [self windowDidLoad:window];
+            } else {
+              [self errorLoadingWindow];
+            }
+        }];
+
+//庞大的block应该单独定义成变量使用
+void (^largeBlock)(void) = ^{
+    // ...
+};
+[_operationQueue addOperationWithBlock:largeBlock];
+
+//在一个调用中使用多个block，注意到他们不是像函数那样通过':'对齐的，而是同时进行了4个空格的缩进
+[myObject doSomethingWith:arg1
+    firstBlock:^(Foo *a) {
+        // ...
+    }
+    secondBlock:^(Bar *b) {
+        // ...
+    }];
+```
+
+###数据结构的语法糖
+
+应该使用可读性更好的语法糖来构造`NSArray`，`NSDictionary`等数据结构，避免使用冗长的`alloc`,`init`方法。
+
+如果构造代码写在一行，需要在括号两端留有一个空格，使得被构造的元素于与构造语法区分开来：
+
+```objective-c
+//正确，在语法糖的"[]"或者"{}"两端留有空格
+NSArray *array = @[ [foo description], @"Another String", [bar description] ];
+NSDictionary *dict = @{ NSForegroundColorAttributeName : [NSColor redColor] };
+
+//不正确，不留有空格降低了可读性
+NSArray* array = @[[foo description], [bar description]];
+NSDictionary* dict = @{NSForegroundColorAttributeName: [NSColor redColor]};
+```
+
+如果构造代码不写在一行内，构造元素需要使用**两个空格**来进行缩进，右括号`]`或者`}`写在新的一行，并且与调用语法糖那行代码的第一个非空字符对齐：
+
+```objective-c
+NSArray *array = @[
+  @"This",
+  @"is",
+  @"an",
+  @"array"
+];
+
+NSDictionary *dictionary = @{
+  NSFontAttributeName : [NSFont fontWithName:@"Helvetica-Bold" size:12],
+  NSForegroundColorAttributeName : fontColor
+};
+```
+
+构造字典时，字典的Key和Value与中间的冒号`:`都要留有一个空格，多行书写时，也可以将Value对齐：
+
+```objective-c
+//正确，冒号':'前后留有一个空格
+NSDictionary *option1 = @{
+  NSFontAttributeName : [NSFont fontWithName:@"Helvetica-Bold" size:12],
+  NSForegroundColorAttributeName : fontColor
+};
+
+//正确，按照Value来对齐
+NSDictionary *option2 = @{
+  NSFontAttributeName :            [NSFont fontWithName:@"Arial" size:12],
+  NSForegroundColorAttributeName : fontColor
+};
+
+//错误，冒号前应该有一个空格
+NSDictionary *wrong = @{
+  AKey:       @"b",
+  BLongerKey: @"c",
+};
+
+//错误，每一个元素要么单独成为一行，要么全部写在一行内
+NSDictionary *alsoWrong= @{ AKey : @"a",
+                            BLongerKey : @"b" };
+
+//错误，在冒号前只能有一个空格，冒号后才可以考虑按照Value对齐
+NSDictionary *stillWrong = @{
+  AKey       : @"b",
+  BLongerKey : @"c",
+};
+```
 
 
+##编码风格
 
+每个人都有自己的编码风格，这里总结了一些比较好的Cocoa编程风格和注意点。
+
+###不要使用new方法
+
+尽管很多时候能用`new`代替`alloc init`方法，但这可能会导致调试内存时出现不可预料的问题。Cocoa的规范就是使用`alloc init`方法，使用`new`会让一些读者困惑。
+
+###Public API要尽量简洁
+
+共有接口要设计的简洁，满足核心的功能需求就可以了。不要设计很少会被用到，但是参数极其复杂的API。如果要定义复杂的方法，使用类别或者类扩展。
+
+###\#import和\#include
+
+`#import`是Cocoa中常用的引用头文件的方式，它能自动防止重复引用文件，什么时候使用`#import`，什么时候使用`#include`呢？
+
+- 当引用的是一个Objective-C或者Objective-C++的头文件时，使用`#import`
+- 当引用的是一个C或者C++的头文件时，使用`#include`，这时必须要保证被引用的文件提供了保护域（#define guard）。
+
+栗子：
+
+```objective-c
+#import <Cocoa/Cocoa.h>
+#include <CoreFoundation/CoreFoundation.h>
+#import "GTMFoo.h"
+#include "base/basictypes.h"
+```
+
+为什么不全部使用`#import`呢？主要是为了保证代码在不同平台间共享时不出现问题。
+
+###引用框架的根头文件
+
+上面提到过，每一个框架都会有一个和框架同名的头文件，它包含了框架内接口的所有引用，在使用框架的时候，应该直接引用这个根头文件，而不是其它子模块的头文件，即使是你只用到了其中的一小部分，编译器会自动完成优化的。
+
+```objective-c
+//正确，引用根头文件
+#import <Foundation/Foundation.h>
+
+//错误，不要单独引用框架内的其它头文件
+#import <Foundation/NSArray.h>
+#import <Foundation/NSString.h>
+```
+
+###BOOL的使用
+
+BOOL在Objective-C中被定义为`signed char`类型，这意味着一个BOOL类型的变量不仅仅可以表示`YES`(1)和`NO`(0)两个值，所以永远**不要**将BOOL类型变量直接和`YES`比较：
+
+```objective-c
+//错误，无法确定|great|的值是否是YES(1)，不要将BOOL值直接与YES比较
+BOOL great = [foo isGreat];
+if (great == YES)
+  // ...be great!
+
+//正确
+BOOL great = [foo isGreat];
+if (great)
+  // ...be great!
+```
+
+同样的，也不要将其它类型的值作为BOOL来返回，这种情况下，BOOL变量只会取值的最后一个字节来赋值，这样很可能会取到0（NO）。但是，一些逻辑操作符比如`&&`,`||`,`!`的返回是可以直接赋给BOOL的：
+
+```objective-c
+//错误，不要将其它类型转化为BOOL返回
+- (BOOL)isBold {
+  return [self fontTraits] & NSFontBoldTrait;
+}
+- (BOOL)isValid {
+  return [self stringValue];
+}
+
+//正确
+- (BOOL)isBold {
+  return ([self fontTraits] & NSFontBoldTrait) ? YES : NO;
+}
+
+//正确，逻辑操作符可以直接转化为BOOL
+- (BOOL)isValid {
+  return [self stringValue] != nil;
+}
+- (BOOL)isEnabled {
+  return [self isValid] && [self isBold];
+}
+```
+
+另外BOOL类型可以和`_Bool`,`bool`相互转化，但是**不能**和`Boolean`转化。
+
+###使用ARC
+
+除非想要兼容一些古董级的机器和操作系统，我们没有理由放弃使用ARC。在最新版的Xcode(6.2)中，ARC是自动打开的，所以直接使用就好了。
+
+###在init和dealloc中不要用存取方法访问实例变量
+
+当`init``dealloc`方法被执行时，类的运行时环境不是处于正常状态的，使用存取方法访问变量可能会导致不可预料的结果，因此应当在这两个方法内直接访问实例变量。
+
+```objective-c
+//正确，直接访问实例变量
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    _bar = [[NSMutableString alloc] init];
+  }
+  return self;
+}
+- (void)dealloc {
+  [_bar release];
+  [super dealloc];
+}
+
+//错误，不要通过存取方法访问
+- (instancetype)init {
+  self = [super init];
+  if (self) {
+    self.bar = [NSMutableString string];
+  }
+  return self;
+}
+- (void)dealloc {
+  self.bar = nil;
+  [super dealloc];
+}
+```
+
+###按照定义的顺序释放资源
+
+在类或者Controller的生命周期结束时，往往需要做一些扫尾工作，比如释放资源，停止线程等，这些扫尾工作的释放顺序应当与它们的初始化或者定义的顺序保持一致。这样做是为了方便调试时寻找错误，也能防止遗漏。
+
+###保证NSString在赋值时被复制
+
+`NSString`非常常用，在它被传递或者赋值时应当保证是以复制（copy）的方式进行的，这样可以防止在不知情的情况下String的值被其它对象修改。
+
+```objective-c
+- (void)setFoo:(NSString *)aFoo {
+  _foo = [aFoo copy];
+}
+```
+
+###使用NSNumber的语法糖
+
+使用带有`@`符号的语法糖来生成NSNumber对象能使代码更简洁：
+
+```objective-c
+NSNumber *fortyTwo = @42;
+NSNumber *piOverTwo = @(M_PI / 2);
+enum {
+  kMyEnum = 2;
+};
+NSNumber *myEnum = @(kMyEnum);
+```
+
+###nil检查
+
+因为在Objective-C中向nil对象发送命令是不会抛出异常或者导致崩溃的，只是完全的“什么都不干”，所以，只在程序中使用nil来做逻辑上的检查。
+
+另外，不要使用诸如`nil == Object`或者`Object == nil`的形式来判断。
+
+```objective-c
+//正确，直接判断
+if (!objc) {
+	...	
+}
+
+//错误，不要使用nil == Object的形式
+if (nil == objc) {
+	...	
+}
+```
+
+###属性的线程安全
+
+定义一个属性时，编译器会自动生成线程安全的存取方法（Atomic），但这样会大大降低性能，特别是对于那些需要频繁存取的属性来说，是极大的浪费。所以如果定义的属性不需要线程保护，记得手动添加属性关键字`nonatomic`来取消编译器的优化。
+
+###点分语法的使用
+
+不要用点分语法来调用方法，只用来访问属性。这样是为了防止代码可读性问题。
+
+```objective-c
+//正确，使用点分语法访问属性
+NSString *oldName = myObject.name;
+myObject.name = @"Alice";
+
+//错误，不要用点分语法调用方法
+NSArray *array = [NSArray arrayWithObject:@"hello"];
+NSUInteger numberOfItems = array.count;
+array.release;
+```
+
+###Delegate要使用弱引用
+
+一个类的Delegate对象通常还引用着类本身，这样很容易造成引用循环的问题，所以类的Delegate属性要设置为弱引用。
+
+```objective-c
+/** delegate */
+@property (nonatomic, weak) id <IPCConnectHandlerDelegate> delegate;
+```
 
 
 
