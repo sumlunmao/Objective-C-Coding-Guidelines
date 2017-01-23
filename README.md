@@ -57,6 +57,11 @@
 #### 清晰
 尽可能遵守 Apple 的命名约定,命名应该尽可能的清晰和简洁，但在Objective-C中，清晰比简洁更重要。由于Xcode强大的自动补全功能，我们不必担心名称过长的问题。
 
+- 类名采用大驼峰（UpperCamelCase）
+- 类成员、方法小驼峰（lowerCamelCase）
+- 局部变量大小写首选小驼峰，也可使用小写下划线的形式（snake_case）
+- C函数的命名用大驼峰
+
 ```
 //清晰
 insertObject:atIndex:
@@ -74,6 +79,12 @@ remove:
 
 
 ```
+// OK
+ID, URL, JSON, WWW
+
+// 糟糕
+id, Url, json, www
+
 //清晰
 destinationSelection
 setBackgroundColor:
@@ -549,6 +560,47 @@ NSColorPanelColorDidChangeNotification
 
 同样的，在`Xcode > Preferences > Text Editing > Page guide at column:`中将最大行长设置为**80**，过长的一行代码将会导致可读性问题。
 
+### 空格
+
+类方法声明在方法类型与返回类型之间要有空格。
+
+```
+// 糟糕
+-(void)methodName:(NSString *)string;
+
+// OK
+- (void)methodName:(NSString *)string;
+```
+
+条件判断的括号内侧不应有空格。
+
+
+```
+// 糟糕
+if ( a < b ) {
+    // something
+}
+
+// OK
+if (a < b) {
+    // something
+}
+```
+
+关系运算符（如 >=、!=）和逻辑运算符（如 &&、||）两边要有空格。
+
+
+```
+// OK
+(someValue > 100)? YES : NO
+
+// OK
+(items)?: @[]
+```
+
+二元算数运算符两侧是否加空格不确定，根据情况自己定。一元运算符与操作数之前没有空格。
+
+
 ###函数的书写
 
 一个典型的Objective-C函数应该是这样的：
@@ -776,6 +828,58 @@ NSDictionary *stillWrong = @{
   AKey       : @"b",
   BLongerKey : @"c",
 };
+```
+
+###代码组织
+- 函数长度（行数）不应超过2/3屏幕，禁止超过70行。 : 例外：对于顺序执行的初始化函数，如果其中的过程没有提取为独立方法的必要，则不必限制长度。
+- 单个文件方法数不应超过30个
+- 不要按类别排序（如把IBAction放在一块），应按任务把相关的组合在一起
+- 禁止出现超过两层循环的代码，用函数或block替代。
+尽早返回错误：
+
+
+```
+// 为了简化示例，没有错误处理，并使用了伪代码
+
+// 糟糕的例子
+- (Task *)creatTaskWithPath:(NSString *)path {
+    Task *aTask;
+    if ([path isURL]) {
+        if ([fileManager isWritableFileAtPath:path]) {
+            if (![taskManager hasTaskWithPath:path]) {
+                aTask = [[Task alloc] initWithPath:path];
+            }
+            else {
+                return nil;
+            }
+        }
+        else {
+            return nil;
+        }
+    }
+    else {
+        return nil;
+    }
+    return aTask;
+}
+
+// 改写的例子
+- (Task *)creatTaskWithPath:(NSString *)path {
+    if (![path isURL]) {
+        return nil;
+    }
+
+    if (![fileManager isWritableFileAtPath:path]) {
+        return nil;
+    }
+
+    if ([taskManager hasTaskWithPath:path]) {
+        return nil;
+    }
+
+    Task *aTask = [[Task alloc] initWithPath:path];
+    return aTask;
+}
 ```
 
 
