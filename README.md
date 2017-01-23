@@ -75,23 +75,23 @@ setBackgroundColor:
 destSel
 setBkgdColor:
 ```
-#### 一致性
+####一致性
 整个工程的命名风格要保持一致性，最好和苹果SDK的代码保持统一。不同类中完成相似功能的方法应该叫一样的名字，比如我们总是用count来返回集合的个数，不能在A类中使用count而在B类中使用getNumber。
 
-#### 使用前缀
+####使用前缀
 如果代码需要打包成Framework给别的工程使用，或者工程项目非常庞大，需要拆分成不同的模块，使用命名前缀是非常有用的。
 
 - 前缀由大写的字母缩写组成，比如Cocoa中NS前缀代表Founation框架中的类，IB则代表Interface Builder框架。
 - 可以在为类、协议、函数、常量以及typedef宏命名的时候使用前缀，但注意不要为成员变量或者方法使用前缀，因为他们本身就包含在类的命名空间内。
 - 命名前缀的时候不要和苹果SDK框架冲突。
 
-### 命名类和协议（Class&Protocol）
+###命名类和协议
 
 类名以大写字母开头，应该包含一个名词来表示它代表的对象类型，同时可以加上必要的前缀，比如NSString, NSDate, NSScanner, NSApplication等等。
 
 而协议名称应该清晰地表示它所执行的行为，而且要和类名区别开来，所以通常使用ing词尾来命名一个协议，比如NSCopying,NSLocking。
 
-### 命名头文件（Headers）
+###命名头文件
 
 源码的头文件名应该清晰地暗示它的功能和包含的内容：
 
@@ -182,7 +182,7 @@ Objective-C的方法名通常都比较长，这是为了让程序有更好地可
 ...title:(NSString *)aString
 ```
 
-###存取方法（Accessor Methods）
+###存取方法
 
 存取方法是指用来获取和设置类属性值的方法，属性的不同类型，对应着不同的存取方法规范：
 
@@ -239,7 +239,7 @@ Objective-C的方法名通常都比较长，这是为了让程序有更好地可
 - (void)getLineDash:(float *)pattern count:(int *)count phase:(float *)phase;
 ```
 
-###命名委托（Delegate）
+###命名委托
 
 当特定的事件发生时，对象会触发它注册的委托方法。委托是Objective-C中常用的传递消息的方式。委托有它固定的命名范式。
 
@@ -262,7 +262,7 @@ Objective-C的方法名通常都比较长，这是为了让程序有更好地可
 - (BOOL)windowShouldClose:(id)sender;
 ```
 
-###集合操作类方法（Collection Methods）
+###集合操作类方法
 
 有些对象管理着一系列其它对象或者元素的集合，需要使用类似“增删查改”的方法来对集合进行操作，这些方法的命名范式一般为：
 
@@ -297,7 +297,7 @@ Objective-C的方法名通常都比较长，这是为了让程序有更好地可
 - (void)setParentWindow:(NSWindow *)window;
 ```
 
-###命名函数（Functions）
+###命名函数
 
 在很多场合仍然需要用到函数，比如说如果一个对象是一个单例，那么应该使用函数来代替类方法执行相关操作。
 
@@ -332,7 +332,7 @@ const char *NSGetSizeAndAlignment(const char *typePtr, unsigned int *sizep, unsi
 BOOL NSDecimalIsNotANumber(const NSDecimal *decimal)
 ```
 
-###命名属性和实例变量（Properties&Instance Variables）
+###命名属性和实例变量
 
 属性和对象的存取方法相关联，属性的第一个字母小写，后续单词首字母大写，不必添加前缀。属性按功能命名成名词或者动词：
 
@@ -363,7 +363,7 @@ BOOL NSDecimalIsNotANumber(const NSDecimal *decimal)
 *按苹果的说法，不建议在除了`init`和`dealloc`方法以外的地方直接访问实例变量，但很多人认为直接访问会让代码更加清晰可读，只在需要计算或者执行操作的时候才使用存取方法访问，我就是这种习惯，所以这里不作要求。*
 
 
-###命名常量（Constants）
+###命名常量
 
 如果要定义一组相关的常量，尽量使用枚举类型（enumerations），枚举类型的命名规则和函数的命名规则相同。
 建议使用 `NS_ENUM` 和 `NS_OPTIONS` 宏来定义枚举类型，参见官方的 [Adopting Modern Objective-C](https://developer.apple.com/library/ios/releasenotes/ObjectiveC/ModernizationObjC/AdoptingModernObjective-C/AdoptingModernObjective-C.html) 一文：
@@ -404,7 +404,7 @@ const float NSLightGray;
 
 注意到一般由编译器定义的宏会在前后都有一个`__`，比如*`__MACH__`*。
 
-###命名通知（Notifications）
+###命名通知
 
 通知常用于在模块间传递消息，所以通知要尽可能地表示出发生的事件，通知的命名范式是：
 	
