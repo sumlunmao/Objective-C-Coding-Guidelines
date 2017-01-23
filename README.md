@@ -96,11 +96,8 @@ setBkgdColor:
 源码的头文件名应该清晰地暗示它的功能和包含的内容：
 
 - 如果头文件内只定义了单个类或者协议，直接用类名或者协议名来命名头文件，比如NSLocale.h定义了NSLocale类。
-- 
 - 如果头文件内定义了一系列的类、协议、类别，使用其中最主要的类名来命名头文件，比如NSString.h定义了NSString和NSMutableString。
-- 
 - 每一个Framework都应该有一个和框架同名的头文件，包含了框架中所有公共类头文件的引用，比如Foundation.h
-- 
 - Framework中有时候会实现在别的框架中类的类别扩展，这样的文件通常使用被扩展的框架名+Additions的方式来命名，比如NSBundleAdditions.h。
 ###命名方法（Methods）
 
