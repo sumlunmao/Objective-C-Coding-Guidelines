@@ -52,7 +52,9 @@
   * [断言](#断言)
   * [Categories](#Categories)
   * [Pragma Mark](#Pragma Mark)
-
+* [设计模式](#设计模式)
+  * [ReactiveCocoa+MVVM](#ReactiveCocoa+MVVM)
+ 
 
 ## 命名
 ###基本原则
@@ -1166,8 +1168,21 @@ protocols 的实现
 - (void)viewWillAppear:(BOOL)animated { /* ... */ }
 - (void)didReceiveMemoryWarning { /* ... */ }
 
+## 设计模式
+### ReactiveCocoa+MVVM
+推荐使用ReactiveCocoa+MVVM设计代码架构，只有代码架构上清晰合理了上述规则才能锦上添花。
+
+具体使用方法参考下列文章。
+
+[ReactiveCocoa 和 MVVM 入门](http://yulingtianxia.com/blog/2015/05/21/ReactiveCocoa-and-MVVM-an-Introduction/)
+
+[MVVM With ReactiveCocoa](http://blog.leichunfeng.com/blog/2016/02/27/mvvm-with-reactivecocoa/)
+
+
+
 
 ---
+
 
 
 关于这个编程语言的所有规范，如果这里没有写到，那就在苹果的文档里： 
