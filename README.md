@@ -1168,8 +1168,8 @@ protocols 的实现
 - (void)viewWillAppear:(BOOL)animated { /* ... */ }
 - (void)didReceiveMemoryWarning { /* ... */ }
 
-## 设计模式
-### ReactiveCocoa+MVVM
+##设计模式
+###ReactiveCocoa+MVVM
 推荐使用ReactiveCocoa+MVVM设计代码架构，只有代码架构上清晰合理了上述规则才能锦上添花。
 
 具体使用方法参考下列文章。
