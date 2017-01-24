@@ -51,9 +51,9 @@
   * [KVO](#KVO)
   * [断言](#断言)
   * [Categories](#Categories)
-  * [Pragma Mark](#Pragma Mark)
+  * [Pragma Mark](#pragma-mark)
 * [设计模式](#设计模式)
-  * [ReactiveCocoa+MVVM](#ReactiveCocoa+MVVM)
+  * [ReactiveCocoa+MVVM](#reactivecocoamvvm)
  
 
 ## 命名
