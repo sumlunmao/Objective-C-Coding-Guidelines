@@ -479,7 +479,8 @@ Download-Progressbar-Normal@2x.png
 ![Screenshot](https://raw.github.com/onevcat/VVDocumenter-Xcode/master/ScreenShot.gif)
 
 Xcode8注释快捷键
-![image description](https://raw.github.com/onevcat/VVDocumenter-Xcode/master/ScreenShot.gif)
+
+![image description](https://raw.githubusercontent.com/SOHOVideo/Objective-C-Coding-Guidelines/master/707724-ed9730ab858c08a7.png)
 
 一些良好的注释：
 
@@ -1088,7 +1089,7 @@ KVO触发机制:一个对象(观察者),检测另一个对象(被观察者)的�
 - 实现回调方法
 - 触发回调方法
 - 移除观察者
-- 
+
 一般KVO奔溃的原因:
 
 - 被观察的对象销毁掉了(被观察的对象是一个局部变量)
