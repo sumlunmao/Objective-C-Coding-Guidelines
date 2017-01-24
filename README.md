@@ -21,6 +21,7 @@
   * [命名属性和实例变量数](#命名属性和实例变量)
   * [命名常量](#命名常量)
   * [命名通知](#命名通知)
+  * [图片命名](#图片命名)
 * [注释](#注释)
   * [文件注释](#文件注释)
   * [代码注释](#代码注释)
@@ -54,8 +55,8 @@
 
 
 ## 命名
-### 基本原则
-#### 清晰
+###基本原则
+####清晰
 尽可能遵守 Apple 的命名约定，命名应该尽可能的清晰和简洁，但在Objective-C中，清晰比简洁更重要。
 
 - 类名采用大驼峰（UpperCamelCase）
@@ -398,7 +399,7 @@ NSWindowDidMiniaturizeNotification
 NSTextViewDidChangeSelectionNotification
 NSColorPanelColorDidChangeNotification
 ```
-### 图片命名
+###图片命名
 
 1.用英文命名，不用拼音
 
@@ -540,7 +541,7 @@ Xcode8注释快捷键
 
 同样的，在`Xcode > Preferences > Text Editing > Page guide at column:`中将最大行长设置为**80**，过长的一行代码将会导致可读性问题。
 
-### 空格
+###空格
 
 类方法声明在方法类型与返回类型之间要有空格。
 
@@ -973,7 +974,7 @@ if (great)
 }
 ```
 
-### Designated 和 Secondary 初始化方法
+###Designated 和 Secondary 初始化方法
 
 Objective-C 有指定初始化方法(designated initializer)和间接(secondary initializer)初始化方法的观念。 designated 初始化方法是提供所有的参数，secondary 初始化方法是一个或多个，并且提供一个或者更多的默认参数来调用 designated 初始化的初始化方法。
 
@@ -1082,7 +1083,7 @@ array.release;
    return sharedInstance;
 }
 ```
-### KVO
+###KVO
 KVO触发机制:一个对象(观察者),检测另一个对象(被观察者)的某属性是否发生变化,若被监测的属性发生了更改,会触发观察者的一个方法(方法名固定,类似代理方法)
 
 - 注册观察者(为被观察这指定观察者以及被观察者属性)
@@ -1102,7 +1103,7 @@ KVO触发机制:一个对象(观察者),检测另一个对象(被观察者)的�
 你的方法可能要求一些参数来满足特定的条件（比如不能为nil），在这种情况下最好使用 NSParameterAssert() 来断言条件是否成立或是抛出一个异常。
 
 
-### Categories
+###Categories
 虽然我们知道这样写很丑, 但是我们应该要在我们的 category 方法前加上自己的小写前缀以及下划线，比如- (id)zoc_myCategoryMethod。 这种实践同样被苹果推荐。
 
 这是非常必要的。因为如果在扩展的 category 或者其他 category 里面已经使用了同样的方法名，会导致不可预计的后果。实际上，实际被调用的是最后被加载的那个 category 中方法的实现。
@@ -1148,9 +1149,10 @@ KVO触发机制:一个对象(观察者),检测另一个对象(被观察者)的�
 @end
 ```
 
-### Pragma Mark
+###Pragma Mark
 
- #pragma mark - 是一个在类内部组织代码并且帮助你分组方法实现的好办法。 我们建议使用 #pragma mark - 来分离:
+
+`#pragma mark`是一个在类内部组织代码并且帮助你分组方法实现的好办法。 我们建议使用 `#pragma mark` - 来分离:
 
 不同功能组的方法
 protocols 的实现
@@ -1158,7 +1160,7 @@ protocols 的实现
 - (void)dealloc { /* ... */ }
 - (instancetype)init { /* ... */ }
 
- #pragma mark - View Lifecycle （View 的生命周期）
+`#pragma mark` - View Lifecycle （View 的生命周期）
 
 - (void)viewDidLoad { /* ... */ }
 - (void)viewWillAppear:(BOOL)animated { /* ... */ }
