@@ -16,7 +16,6 @@
   * [命名头文件](#命名头文件)
   * [命名委法](#命名委托)
   * [集合操作类方法](#集合操作类方法)
-  * [命名函数](#命名函数)
   * [命名属性和实例变量数](#命名属性和实例变量)
   * [命名常量](#命名常量)
   * [命名通知](#命名通知)
@@ -25,7 +24,7 @@
 ## 命名
 ### 基本原则
 #### 清晰
-尽可能遵守 Apple 的命名约定,命名应该尽可能的清晰和简洁，但在Objective-C中，清晰比简洁更重要。由于Xcode强大的自动补全功能，我们不必担心名称过长的问题。
+尽可能遵守 Apple 的命名约定，命名应该尽可能的清晰和简洁，但在Objective-C中，清晰比简洁更重要。
 
 - 类名采用大驼峰（UpperCamelCase）
 - 类成员、方法小驼峰（lowerCamelCase）
@@ -87,6 +86,7 @@ setBkgdColor:
 - 如果头文件内定义了一系列的类、协议、类别，使用其中最主要的类名来命名头文件，比如NSString.h定义了NSString和NSMutableString。
 - 每一个Framework都应该有一个和框架同名的头文件，包含了框架中所有公共类头文件的引用，比如Foundation.h
 - Framework中有时候会实现在别的框架中类的类别扩展，这样的文件通常使用被扩展的框架名+Additions的方式来命名，比如NSBundleAdditions.h。
+
 ###命名方法（Methods）
 
 Objective-C的方法名通常都比较长，这是为了让程序有更好地可读性，按苹果的说法*“好的方法名应当可以以一个句子的形式朗读出来”*。
@@ -167,7 +167,7 @@ Objective-C的方法名通常都比较长，这是为了让程序有更好地可
 ...title:(NSString *)aString
 ```
 
-###存取方法
+###命名存取方法
 
 存取方法是指用来获取和设置类属性值的方法，属性的不同类型，对应着不同的存取方法规范：
 
@@ -282,41 +282,6 @@ Objective-C的方法名通常都比较长，这是为了让程序有更好地可
 - (void)setParentWindow:(NSWindow *)window;
 ```
 
-###命名函数
-
-在很多场合仍然需要用到函数，比如说如果一个对象是一个单例，那么应该使用函数来代替类方法执行相关操作。
-
-函数的命名和方法有一些不同，主要是：
-
-- 函数名称一般带有缩写前缀，表示方法所在的框架。
-- 前缀后的单词以“驼峰”表示法显示，第一个单词首字母大写。
-
-函数名的第一个单词通常是一个动词，表示方法执行的操作：
-
-```objective-c
-NSHighlightRect
-NSDeallocateObject
-```
-
-如果函数返回其参数的某个属性，省略动词：
-
-```objective-c
-unsigned int NSEventMaskFromType(NSEventType type)
-float NSHeight(NSRect aRect)
-```
-
-如果函数通过指针参数来返回值，需要在函数名中使用`Get`：
-
-```objective-c
-const char *NSGetSizeAndAlignment(const char *typePtr, unsigned int *sizep, unsigned int *alignp)
-```
-
-函数的返回类型是BOOL时的命名：
-
-```objective-c
-BOOL NSDecimalIsNotANumber(const NSDecimal *decimal)
-```
-
 ###命名属性和实例变量
 
 属性和对象的存取方法相关联，属性的第一个字母小写，后续单词首字母大写，不必添加前缀。属性按功能命名成名词或者动词：
@@ -344,8 +309,6 @@ BOOL NSDecimalIsNotANumber(const NSDecimal *decimal)
 ```
 
 一般来说，类需要对使用者隐藏数据存储的细节，所以不要将实例方法定义成公共可访问的接口，可以使用`@private`，`@protected`前缀。
-
-*按苹果的说法，不建议在除了`init`和`dealloc`方法以外的地方直接访问实例变量，但很多人认为直接访问会让代码更加清晰可读，只在需要计算或者执行操作的时候才使用存取方法访问，我就是这种习惯，所以这里不作要求。*
 
 
 ###命名常量
@@ -483,6 +446,9 @@ Download-Progressbar-Normal@2x.png
 
 ![Screenshot](https://raw.github.com/onevcat/VVDocumenter-Xcode/master/ScreenShot.gif)
 
+Xcode8注释快捷键
+![image description](https://raw.github.com/onevcat/VVDocumenter-Xcode/master/ScreenShot.gif)
+
 一些良好的注释：
 
 ```objective-c
@@ -536,10 +502,6 @@ Download-Progressbar-Normal@2x.png
 
 
 ##代码格式
-
-###使用空格而不是制表符Tab
-
-不要在工程里使用Tab键，使用空格来进行缩进。在`Xcode > Preferences > Text Editing`将Tab和自动缩进都设置为**4**个空格。（_Google的标准是使用两个空格来缩进，但这里还是推荐使用Xcode默认的设置。_）
 
 ###每一行的最大长度
 
@@ -751,7 +713,7 @@ void (^largeBlock)(void) = ^{
     }];
 ```
 
-###数据结构的语法糖
+###字面量语法糖
 
 应该使用可读性更好的语法糖来构造`NSArray`，`NSDictionary`等数据结构，避免使用冗长的`alloc`,`init`方法。
 
@@ -816,11 +778,10 @@ NSDictionary *stillWrong = @{
 ```
 
 ###代码组织
-- 函数长度（行数）不应超过2/3屏幕，禁止超过70行。 : 例外：对于顺序执行的初始化函数，如果其中的过程没有提取为独立方法的必要，则不必限制长度。
+- 函数长度（行数）不应超过2/3屏幕，禁止超过70行。
 - 单个文件方法数不应超过30个
 - 不要按类别排序（如把IBAction放在一块），应按任务把相关的组合在一起
 - 禁止出现超过两层循环的代码，用函数或block替代。
-尽早返回错误：
 
 
 ```
@@ -887,15 +848,6 @@ NSDictionary *stillWrong = @{
 - 当引用的是一个Objective-C或者Objective-C++的头文件时，使用`#import`
 - 当引用的是一个C或者C++的头文件时，使用`#include`，这时必须要保证被引用的文件提供了保护域（#define guard）。
 
-栗子：
-
-```objective-c
-#import <Cocoa/Cocoa.h>
-#include <CoreFoundation/CoreFoundation.h>
-#import "GTMFoo.h"
-#include "base/basictypes.h"
-```
-
 为什么不全部使用`#import`呢？主要是为了保证代码在不同平台间共享时不出现问题。
 
 ###引用框架的根头文件
@@ -953,10 +905,6 @@ if (great)
 ```
 
 另外BOOL类型可以和`_Bool`,`bool`相互转化，但是**不能**和`Boolean`转化。
-
-###使用ARC
-
-除非想要兼容一些古董级的机器和操作系统，我们没有理由放弃使用ARC。在最新版的Xcode(6.2)中，ARC是自动打开的，所以直接使用就好了。
 
 ###init和dealloc
 
@@ -1027,33 +975,20 @@ Objective-C 有指定初始化方法(designated initializer)和间接(secondary 
 @end
 ```
 
-initWithTitle:date:location: 就是 designated 初始化方法，另外的两个是 secondary 初始化方法。因为它们仅仅是调用类实现的 designated 初始化方法
+initWithTitle: date: location: 就是 designated 初始化方法，另外的两个是 secondary 初始化方法。因为它们仅仅是调用类实现的 designated 初始化方法
 
 ###按照定义的顺序释放资源
 
 在类或者Controller的生命周期结束时，往往需要做一些扫尾工作，比如释放资源，停止线程等，这些扫尾工作的释放顺序应当与它们的初始化或者定义的顺序保持一致。这样做是为了方便调试时寻找错误，也能防止遗漏。
 
-###保证NSString在赋值时被复制
+###保证NSObject在赋值时被复制
 
-`NSString`非常常用，在它被传递或者赋值时应当保证是以复制（copy）的方式进行的，这样可以防止在不知情的情况下String的值被其它对象修改。
+在传递或者赋值时应当保证是以复制（copy）的方式进行的，这样可以防止在不知情的情况下String的值被其它对象修改。
 
 ```objective-c
 - (void)setFoo:(NSString *)aFoo {
   _foo = [aFoo copy];
 }
-```
-
-###使用NSNumber的语法糖
-
-使用带有`@`符号的语法糖来生成NSNumber对象能使代码更简洁：
-
-```objective-c
-NSNumber *fortyTwo = @42;
-NSNumber *piOverTwo = @(M_PI / 2);
-enum {
-  kMyEnum = 2;
-};
-NSNumber *myEnum = @(kMyEnum);
 ```
 
 ###nil检查
@@ -1074,11 +1009,7 @@ if (nil == objc) {
 }
 ```
 
-###属性的线程安全
-
-定义一个属性时，编译器会自动生成线程安全的存取方法（Atomic），但这样会大大降低性能，特别是对于那些需要频繁存取的属性来说，是极大的浪费。所以如果定义的属性不需要线程保护，记得手动添加属性关键字`nonatomic`来取消编译器的优化。
-
-###点分语法的使用
+###点语法的使用
 
 不要用点分语法来调用方法，只用来访问属性。这样是为了防止代码可读性问题。
 
@@ -1102,7 +1033,7 @@ array.release;
 @property (nonatomic, weak) id <IPCConnectHandlerDelegate> delegate;
 ```
 
-### 单例
+###单例
 
 如果可能，请尽量避免使用单例而是依赖注入。 然而，如果一定要用，请使用一个线程安全的模式来创建共享的实例。对于 GCD，用 dispatch_once() 函数就可以咯。
 
@@ -1119,18 +1050,29 @@ array.release;
 }
 ```
 ### KVO
+KVO触发机制:一个对象(观察者),检测另一个对象(被观察者)的某属性是否发生变化,若被监测的属性发生了更改,会触发观察者的一个方法(方法名固定,类似代理方法)
 
-### 参数断言
+- 注册观察者(为被观察这指定观察者以及被观察者属性)
+- 实现回调方法
+- 触发回调方法
+- 移除观察者
+- 
+一般KVO奔溃的原因:
+
+- 被观察的对象销毁掉了(被观察的对象是一个局部变量)
+- 观察者被释放掉了,但是没有移除监听(如模态推出,push,pop等)
+- 注册的监听没有移除掉,又重新注册了一遍监听
+
+
+###断言
 
 你的方法可能要求一些参数来满足特定的条件（比如不能为nil），在这种情况下最好使用 NSParameterAssert() 来断言条件是否成立或是抛出一个异常。
 
 
-Categories
+### Categories
 虽然我们知道这样写很丑, 但是我们应该要在我们的 category 方法前加上自己的小写前缀以及下划线，比如- (id)zoc_myCategoryMethod。 这种实践同样被苹果推荐。
 
-这是非常必要的。因为如果在扩展的 category 或者其他 category 里面已经使用了同样的方法名，会导致不可预计的后果。实际上，实际被调用的是最后被加载的那个 category 中方法的实现(译者注：如果导入的多个 category 中有一些同名的方法导入到类里时，最终调用哪个是由编译时的加载顺序来决定的，最后一个加载进来的方法会覆盖之前的方法)。
-
-如果想要确认你的分类方法没有覆盖其他实现的话，可以把环境变量 OBJC_PRINT_REPLACED_METHODS 设置为 YES，这样那些被取代的方法名字会打印到 Console 中。现在 LLVM 5.1 不会为此发出任何警告和错误提示，所以自己小心不要在分类中重载方法。
+这是非常必要的。因为如果在扩展的 category 或者其他 category 里面已经使用了同样的方法名，会导致不可预计的后果。实际上，实际被调用的是最后被加载的那个 category 中方法的实现。
 
 一个好的实践是在 category 名中使用前缀。
 
@@ -1173,12 +1115,9 @@ Categories
 @end
 ```
 
+### Pragma Mark
 
-Pragma
-
-Pragma Mark
-
-#pragma mark - 是一个在类内部组织代码并且帮助你分组方法实现的好办法。 我们建议使用 #pragma mark - 来分离:
+ #pragma mark - 是一个在类内部组织代码并且帮助你分组方法实现的好办法。 我们建议使用 #pragma mark - 来分离:
 
 不同功能组的方法
 protocols 的实现
@@ -1186,30 +1125,20 @@ protocols 的实现
 - (void)dealloc { /* ... */ }
 - (instancetype)init { /* ... */ }
 
-#pragma mark - View Lifecycle （View 的生命周期）
+ #pragma mark - View Lifecycle （View 的生命周期）
 
 - (void)viewDidLoad { /* ... */ }
 - (void)viewWillAppear:(BOOL)animated { /* ... */ }
 - (void)didReceiveMemoryWarning { /* ... */ }
 
 
-
 ---
-
----
-
 
 
 关于这个编程语言的所有规范，如果这里没有写到，那就在苹果的文档里： 
 
-* [Objective-C 编程语言][Introduction_1]
-* [Cocoa 基本原理指南][Introduction_2]
 * [Cocoa 编码指南][Introduction_3]
 * [iOS 应用编程指南][Introduction_4]
-
-[Introduction_1]:http://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/ObjectiveC/Introduction/introObjectiveC.html
-
-[Introduction_2]:https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CocoaFundamentals/Introduction/Introduction.html
 
 [Introduction_3]:https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CodingGuidelines/CodingGuidelines.html
 
